@@ -1,0 +1,64 @@
+main=_{SOI ~PUSH("")~ (choice|end)+ ~ atfunc* ~EOI}
+atfunc= {"@"~var~ "(" ~rvalue~ ":"~ty~ ("," ~ rvalue~ ":"~ty)* ~ ")"~("->"~ty)*~block}
+end= {block|choice}
+block =  {(&(tab ~ PEEK)~PUSH("\t"*)~choice~DROP)+}
+choice =  {ternary|massign|passign|assign|decl|array|printstringy|printexpr|ifexpr|forloop|whileloop|rvalue}
+expr =  {(tab~PEEK~choice~ (tab~PEEK~choice)* |!nl~choice)|svalue }
+nl = _{"\n"}
+tab=_{"\t"}
+target ={array|var}
+rint={array|func|var|basevalue}
+rvalue={cond|array|binop|func|var|baseop|basevalue|string}
+binvalue={func|cond|binop|array|baseop|var|basevalue|string}
+rbool={func|cond|array|var}
+ty={((basevalue ~ fois)* ~ i64) | arr | ("bool")}
+fois={"x"}
+arr={("arr[i64]")}
+i64={"i64"}
+printstringy =  {"print" ~ when~ ("and" ~ when)* ~ "or" ~ rvalue}
+decl =  {"let" ~ var ~ ("," ~ var)* ~ ":" ~ ty}
+when=_{rvalue~"when"~rbool}
+forloop   =  {"for" ~ var ~ "in" ~(iter|var)~ ("with" ~ var ~"="~rvalue)* ~end}
+whileloop   =  {"while" ~ rvalue ~end}
+ifexpr    =  {"if" ~ cond ~end}
+printexpr =  {"print" ~ expr}
+ternary =  {rbool~"?" ~ rvalue ~"else"~ "false"}
+
+assign   =  {target ~ ":=" ~ rvalue}
+passign   =  {target ~ "+=" ~ rvalue}
+massign   =  {target ~ "-=" ~ rvalue}
+cond      =  {rint ~ (((pge| pg) ~ svalue)+|(eq~ svalue)+)|(not ~ cond)}
+pge     =  {">="}
+pg     =  {">"}
+not     =  {"!"}
+eq     =  {"="}
+svalue= _{string|binop|iter}
+
+
+iter      =  {itercc|iterco|iteroc|iteroo}
+
+itercc    =  {"[" ~ rint ~ ";" ~ rint ~ "]"}
+iterco    =  {"[" ~ rint ~ ";" ~ rint ~ "["}
+iteroc    =  {"]" ~ rint ~ ";" ~ rint ~ "]"}
+iteroo    =  {"]" ~ rint ~ ";" ~ rint ~ "["}
+string     =  @{("\""~(basevalue|spechar|" "|"'")* ~ "\"")|("'"~(basevalue|spechar|" "|"\"")* ~ "'")}
+func     =  {var ~ "(" ~(rvalue~ ("," ~ rvalue)*)* ~ ")"}
+array     =  {var ~ "[" ~binvalue~ "]"}
+spechar     =  {'('..'?'|"%"}
+
+binop       =  {rint ~urem ~ rvalue | rint ~pow ~ binop | string ~times ~ binop}
+baseop       =  {rint ~ (plus|times|minus) ~ rvalue}
+times={"*"}
+plus={"+"}
+minus={"-"}
+pow={"**"}
+urem={"%"}
+
+basevalue= @{(alpha|digit)+}
+
+int     =  @{digit+}
+var = @{(alpha|"_") ~ (basevalue|"_")*}
+
+alpha     =  {'a'..'z'}
+digit     =  {'0'..'9'}
+WHITESPACE = _{" "|"\n"}

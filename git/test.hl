@@ -1,0 +1,221 @@
+@queue(li:liste) -> liste
+	extraire li.1 : liste
+@tete(li:liste) -> i64
+	extraire li.0 : i64
+@estvide(li:liste) -> bool
+	li==liVide : liste
+@conc(li1:liste, li2 : liste) -> liste
+	estvide(li1)? li2: cons(tete(li1), conc(queue(li1),li2))
+@conchy(li1:liste, li2 : liste) -> liste
+	cons(7+2, estvide(li1)? li2: cons(tete(li1), conchy(queue(li1),li2)))
+
+a: liste := cons(7, liVide)
+arg1 := [10,11,12,13,14]
+arg2 := [15,11,12,13,14]
+printli(conc(a, conc(arg1,arg2)))
+	printli(estvide(arg1)? arg2: cons(tete(arg1), conc(queue(arg1),arg2)))
+	printli(estvide(arg2)? arg1: cons(tete(arg2), conc(queue(arg2),arg1)))
+	printli(conchy(arg1,arg2))
+#
+///
+@queue li:liste -> liste
+	extraire li.1 : liste
+@tete li:liste -> i64
+	extraire li.0 : i64
+@estvide li:liste -> bool
+	li==liVide : liste
+@conc li1:liste li2:liste -> liste
+	estvide(li1)? li2: cons(tete(li1), conc(queue(li1),li2))
+	estvide li1 ? li2 : cons tete li1 conc queue li1 li2
+@conchy li1:liste li2:liste -> liste
+	cons(7+2, estvide(li1)? li2: cons(tete(li1), conchy(queue(li1),li2)))
+	cons 7+2 estvide li1 ? li2 : cons tete li1 conchy queue li1 li2
+
+a: liste := cons 7 liVide
+arg1 := [10,11,12,13,14]
+arg2 := [15,11,12,13,14]
+printli(conc(a, conc(arg1,arg2)))
+	printli estvide arg1 ? arg2 : cons tete arg1 conc queue arg1 arg2
+    printli estvide (arg1 ? arg2 : cons tete arg1 conc queue arg1 arg2)
+	printli(estvide(arg2)? arg1: cons(tete(arg2), conc(queue(arg2),arg1)))
+	printli(conchy(arg1,arg2))
+
+													     
+	type pair{
+		rule:[100],
+		str:[1000],
+		next: pair*,
+		into: pair*
+	}
+
+	str_split(stri.get, ',')
+
+	tokstopairs(tokens)
+		alloca num[8 x pair]: i64 -> pair* 
+		num[0].0.load.memset(0,100)
+		num[0].1.load.memset(0,1000)
+		__while i:=0, n:=1
+			    currtok := tokens.nth(i)
+			    curr0 := currtok.get
+			    curr0 != nullptr do 
+			    curr1 := currtok.nth(1).get
+			    curr2 := currtok.nth(2).get
+			    curr3 := currtok.nth(3).get
+			    curr0        -str> num[n].0
+			    curr1        -str> num[n].1
+			num[curr2.strtoi64] -> num[n].2
+			num[curr3.strtoi64] -> num[n].3
+			    curr0.free;
+			    curr1.free;
+			    curr2.free;
+			    curr3.free;
+			i+4, n+1
+		tokens.get.free
+		num[1]
+
+	rule(self)
+		self[0].0
+
+	str(self)
+		self[0].1
+
+	next(self)
+		self[0].2.get
+
+	into(self)
+		self[0].3.get
+
+	choice(n, buf)
+		match n.rule
+			"whiloop":
+			"forloop":
+				a=n.into.next.str
+				i=makeindex(n.into.next)
+				choice(n.into.next, newbuf b)
+				choice(n.into.next, newbuf c)
+				buf.addstr("%in1 = constant 1 : index\n{i}\nscf.for %in{a} = {b} step %in1{{\n%{a} = std.index_cast %in{a}: index to i64{c}}}\n", a, b, c, i)
+				"%in1 = constant 1 : index".pn
+				i.str.pn
+				printn "scf.for %in", a.str, " = ", b.str, " step %in1{"
+				//"scf.for %in".p; a.str.p; " = "; b.str.p; " step %in1{".pn
+				"%".p; a.str.p; " = std.index_cast %in"; a.str.p; ": index to i64".p c.str.p; "}".pn
+			"": ""
+
+	main
+		alloca stri[1i8 x i8]: i8 -> i8**
+		alloca size[1 x i8]: i64 -> i64*
+		_getdelim(stri, size, 255i32, @stdin.get)
+		tokens := str_split(stri.get, 44i8)
+		main := tokstopairs(tokens)
+		//print main.into.rule, main.into.next.rule
+		//print main.next.rule
+		choice(main.into, newbuf tot)
+		print tot
+													
+													
+a,a,0,2,b,b,1,1
+
+
+changetete:=inserer(3, li.0)
+changequeue:=inserer(l2, li1.1)
+queue:=extraire(li1.1)
+tete:=extraire(li1.0)
+
+@conc(li1:liste, li2 : liste) -> liste
+	estvide(li1)? inserer(l2, li1.1): conc(queue(li1),li2)
+
+[10,11,12,13,14]->arg0
+arg0[3]+11->a
+print a
+15>a>13? print "test"
+print "test"
+
+
+for x in [0; arg1]
+	for y in [0; arg0[x]]
+		putchar(124)
+	putchar(10)
+
+@sum(arg0:[i64], arg1 : i64) -> i64
+	for x in [0; arg1] with sum=0
+		sum+arg0[x]
+		
+func @sum(%arg0: !llvm.ptr<i64>, %arg1: i64)-> i64 { 
+  	%in0 = constant 0 : index
+	%in1 = constant 1 : index
+	%1 = std.index_cast %arg1: i64 to index
+	%sum_0 = constant 0 : i64
+	%sum = scf.for %4 = %in0 to %1 step %in1 iter_args(%sum_iter = %sum_0) -> (i64) {
+		%5 = std.index_cast %4: index to i64
+      	%6 = llvm.getelementptr %arg0[%5] : (!llvm.ptr<i64>,  i64) -> !llvm.ptr<i64>
+     	%7 = llvm.load %6: !llvm.ptr<i64>
+		%sum_next = addi %sum_iter, %7 : i64
+		scf.yield %sum_next : i64
+		}
+  	return %sum : i64
+  }
+  		%5= constant 3 : index
+      	%6a = llvm.getelementptr %arg0[%5] : (!llvm.ptr<i64>,  i64) -> !llvm.ptr<i64>
+     	%6 = llvm.load %6a: !llvm.ptr<i64>
+     	
+
+
+module {
+llvm.func @printf(!llvm.ptr<i8>, ...) -> i32
+func @main(){ 
+%2 = constant 0: i64
+%4 = constant 3: i64
+%c5 = constant 5: i64
+%c = constant dense<[10,11,12,13,14]> : vector<5xi64>
+%1 = llvm.alloca %c5 x i64: (i64) -> !llvm.ptr<vector<5 x i64>>
+llvm.store %c, %1: !llvm.ptr<vector<5 x i64>>
+%a3 = llvm.getelementptr %1[%4] : (!llvm.ptr<vector<5 x i64>>,  i64) -> !llvm.ptr<i64>
+%3 = llvm.load %a3: !llvm.ptr<i64>
+
+%5 = addi %3, %2: i64
+
+return
+}
+}
+
+    	
+module {
+llvm.func @printf(!llvm.ptr<i8>, ...) -> i32
+func @main(){ 
+%1 = constant 3: i64
+%3 = constant 0: i64
+
+%arg0=llvm.alloca %1 x i64: (i64) -> !llvm.ptr<i64>
+%inlnbt = std.index_cast %1: i64 to index
+scf.for %21 = %in0 to %inlnbt step %in1 {
+	%22 = std.index_cast %21: index to i64
+	%24 = llvm.getelementptr %11[%22] : (!llvm.ptr<i64>,  i64) -> !llvm.ptr<i64>
+	llvm.store %n8, %24: !llvm.ptr<i64>
+}
+
+%a0 = llvm.getelementptr %arg0[%1] : (!llvm.ptr<i64>,  i64) -> !llvm.ptr<i64>
+%0 = llvm.load %a0: !llvm.ptr<i64>
+
+%2 = addi %0, %3: i64
+return
+}
+}
+
+
+define dso_local i32 @main() local_unnamed_addr #0 {
+  %1 = alloca <5 x i64>, align 16
+  %2 = alloca i64, align 8
+  %3 = bitcast <5 x i64>* %1 to i8*
+  %4 = alloca i64, align 8
+  store <5 x i64> <i64 19, i64 10, i64 8, i64 17, i64 9>, <5 x i64>* %1, align 16
+  %5 = alloca i64, align 8
+  %6 = bitcast i64* %2 to i8*
+  %7 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i64 0, i64 0), i64* nonnull %2)
+  %8 = load i64, i64* %2, align 8, !tbaa !2
+  %9 = getelementptr inbounds <5 x i64>, <5 x i64>* %1, i64 0, i64 %8
+  %10 = load i64, i64* %9, align 8, !tbaa !2
+  %11 = call i32 (i8*, ...) @printf(i8* nonnull dereferenceable(1) getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i64 0, i64 0), i64 %10)
+  ret i32 0
+}
+
+
