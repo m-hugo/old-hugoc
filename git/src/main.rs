@@ -109,7 +109,7 @@ func @printli(%0: !llvm.ptr<!llvm.struct<"a", (i64, ptr<struct<"a">>)>>) ->i64 {
 	return %n1: i64 
 }
 "###.to_string()+getarrstr().as_str();
-    fs::write("./current/out.mlir",header+outp.as_str()).expect("Unable to write file");
+    fs::write("./codegen/out.mlir",header+outp.as_str()).expect("Unable to write file");
 }
 fn getarrconst() -> String{
     let values=ARRAY.lock().unwrap().clone();

@@ -1,0 +1,72 @@
+main=_{SOI ~PUSH("")~ (atfunc ~nl*)* ~ body ~ lastline~ nl* ~(EOI|"///")}
+atfunc= {"@"~var~ "(" ~rvalue~ ":"~ty~ ("," ~ rvalue~ ":"~ty)* ~ ")"~("->"~ty)*~block}
+end= {block|choice}
+lastline= {"#" ~ (choice)*}
+body= {((choice|end)~"\n"*)+}
+block =  {nl*~(&(tab ~ PEEK)~PUSH("\t"*)~choice~DROP)+}
+choice =  {ternary|assignlist|assignarray|massign|passign|assign|decl|array|func|printstringy|printnum|printexpr|ifexpr|forloop|whileloop|rvalue}
+expr =  {(tab~PEEK~choice~ (tab~PEEK~choice)* |!nl~choice)|svalue }
+nl = _{"\n"}
+tab=_{"\t"}
+target =_{array|var}
+rint={array|func|var|basevalue}
+rvalue={cond|baseop|extraire|livide|array|binop|ternary|func|cond|var|basevalue|string}
+binvalue={func|cond|binop|array|baseop|var|basevalue|string}
+rbool={func|cond|array|var}
+ty={((basevalue ~ fois)* ~ i64) | "liste" | arr | ("bool")}
+fois={"x"}
+livide={"liVide"}
+arr={("[i64]")}
+i64={"i64"}
+printstringy =  {"print" ~ when~ ("and" ~ when)* ~ "or" ~ rvalue}
+decl =  {"let" ~ var ~ ("," ~ var)* ~ ":" ~ ty}
+when=_{rvalue~"when"~rbool}
+forloop   =  {"for" ~ var ~ "in" ~iter~ ("with" ~ var ~"="~rvalue)* ~end}
+whileloop   =  {"while" ~ rvalue ~end}
+ifexpr    =  {"if" ~ cond ~end}
+printnum =  {"print" ~ rint}
+printexpr =  {"print" ~ expr}
+extraire =  {"extraire" ~ var ~ "." ~ int ~ ":" ~ ty}
+ternary =  {rbool~"?" ~ choice ~(":"~ choice)?}
+
+assign   =  {target ~":"~ ty ~":="~ rvalue}
+passign   =  {target ~ "+=" ~ rvalue}
+massign   =  {target ~ "-=" ~ rvalue}
+cond      =  {(rint ~ (((pge| pg) ~ rint)+|(eq~ rint)+)|(not ~ cond))~":"~ty}
+pge     =  {">="}
+pg     =  {">"}
+not     =  {"!"}
+eq     =  {"=="}
+svalue= _{string|binop|iter}
+
+
+iter      =  {itercc|iterco|iteroc|iteroo}
+
+itercc    =  {"[" ~ rvalue ~ ";" ~ rvalue ~ "]"}
+iterco    =  {"[" ~ rint ~ ";" ~ rint ~ "["}
+iteroc    =  {"]" ~ rint ~ ";" ~ rint ~ "]"}
+iteroo    =  {"]" ~ rint ~ ";" ~ rint ~ "["}
+string     =  @{("\""~(basevalue|spechar|" "|"'")* ~ "\"")|("'"~(basevalue|spechar|" "|"\"")* ~ "'")}
+func     =  {var ~ "(" ~(rvalue~ ("," ~ rvalue)*)* ~ ")"}
+array     =  {var ~ "[" ~binvalue~ "]"}
+list     =  {"[" ~rvalue~ (","~rvalue)*~ "]"}
+assignlist     =  {target ~":="~ list}
+assignarray     =  {target ~":="~ var ~ "[" ~binvalue~ "]"}
+spechar     =  {'('..'?'|"%"}
+
+binop       =  {rint ~urem ~ rvalue | rint ~pow ~ binop | string ~times ~ binop}
+baseop       =  {rint ~ (plus|times|minus) ~ rvalue}
+times={"*"}
+plus={"+"}
+minus={"-"}
+pow={"**"}
+urem={"%"}
+
+basevalue= @{(alpha|digit)+}
+
+int     =  @{digit+}
+var = @{(alpha|"_") ~ (basevalue|"_")*}
+
+alpha     =  {'a'..'z'|'A'..'Z'}
+digit     =  {'0'..'9'}
+WHITESPACE = _{" "}
